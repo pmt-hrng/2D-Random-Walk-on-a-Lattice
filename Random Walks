@@ -1,0 +1,49 @@
+#multiple 2D random walks
+#four subplots single figure
+
+from matplotlib import collections  as mc
+import numpy as np
+import pylab as plt
+
+pos=1
+steps = 1300
+coar = np.empty([steps,2],int)
+
+#random walk start cooridiates
+n1=np.array([pos,pos],int)
+n2=np.array([-pos,pos],int)
+n3=np.array([-pos,-pos],int)
+n4=np.array([pos,-pos],int)
+na_list = [n1,n2,n3,n4]
+m=0
+
+#colors of the four random walks
+clr_list = ['g','c','m','y']
+
+with open("raw_ran_576001.txt","r") as rf:
+
+    fig, ((ax1,ax2),(ax3,ax4))=plt.subplots(2,2)
+    tl=[ax1,ax2,ax3,ax4]
+
+    for m in range(4):   
+        for na, clr in zip(na_list, clr_list):
+            coar = np.ones([steps+1,2],int)*na
+
+            for t in range(0,steps):
+                coar[t+1]=coar[t]
+                bin=rf.read(2)     
+                
+                if(bin=="00"):        
+                    coar[t+1][0]+=1
+                elif(bin=="11"):
+                    coar[t+1][0]-=1
+                elif(bin=="01"):
+                    coar[t+1][1]+=1
+                elif(bin=="10"):
+                    coar[t+1][1]-=1
+                    
+            tl[m].set_axis_bgcolor('black')
+            tl[m].plot(coar.T[0],coar.T[1],c=clr)
+plt.show()
+       
+
