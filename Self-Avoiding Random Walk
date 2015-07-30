@@ -1,0 +1,87 @@
+#self avoiding radndom walk
+#plot same set of random data twice with different constraint 
+
+from matplotlib import collections  as mc
+import numpy as np
+import pylab as plt
+
+#Path starting position
+pos=10
+#use to plot entire file
+num_chars = sum(1 for ch in open("ran_num_57600_16b1.txt"))
+
+steps = 2000
+delay = 2200
+coar = np.empty([steps,2],int)
+plots = 2
+
+#random walk start cooridiates
+n1=np.array([pos,pos],int)
+n2=np.array([-pos,pos],int)
+n3=np.array([-pos,-pos],int)
+n4=np.array([pos,-pos],int)
+na_list = [n1,n2,n3,n4]
+
+#matrix of forbidden paths
+btm = np.array([['0011'],['1100'],['0110'],['1001']],str)
+
+#string of previous and most recent move
+pa = ''
+prev = ''
+cur = ''
+
+#colors of the four random walks
+clr_list = ['g','y','m','c']
+
+#self avoiding function
+def self_avoid():
+    global pa,prev,cur,btm,bin
+    bin=rf.read(2)
+    prev=cur
+    cur=bin
+    pa=prev+cur    
+    for m in range(len(btm)):
+        if(pa==btm[m]):
+            bin=prev
+            cur=prev
+
+with open("raw_ran_576001.txt","r") as rf:
+    fig, ((ax1,ax2))=plt.subplots(1,2)
+    ax=[ax1,ax2]
+    
+    for p in range(0,plots):
+        if(p==1):
+            rf.seek(0)
+        for j in range(delay):
+            rf.read(1)
+        for na, clr in zip(na_list, clr_list):   #create a list of coordinates
+            coar = np.ones([steps+1,2],int)*na
+
+            for t in range(0,steps):
+                coar[t+1]=coar[t]
+                if(p==0):
+                    bin=rf.read(2)
+                elif(p==1): 
+                    self_avoid()
+                #determine step direction    
+                if(bin=="00"):
+                    coar[t+1][0]+=1
+                elif(bin=="11"):
+                    coar[t+1][0]-=1
+                elif(bin=="01"):
+                    coar[t+1][1]+=1
+                elif(bin=="10"):
+                    coar[t+1][1]-=1
+                    
+            ax[p].set_axis_bgcolor('black')
+            ax[p].plot(coar.T[0],coar.T[1],c=clr)
+
+ax1.set_title('Random Walk on a Lattice')
+ax2.set_title('Self-Avoiding Random Walk')
+rf.close()
+plt.show()
+
+
+
+    
+   
